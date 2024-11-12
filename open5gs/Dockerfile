@@ -56,7 +56,7 @@ RUN mkdir -p /data/db
 EXPOSE 27017
 
 # Start MongoDB
-#CMD ["mongod", "--bind_ip_all"]
+CMD ["mongod", "--bind_ip_all"]
 
 
 RUN apt-get update && \
