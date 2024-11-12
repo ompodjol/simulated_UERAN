@@ -68,7 +68,7 @@ RUN apt-get update && \
 
 
 # Clone the UERANSIM repository
-RUN git clone https://github.com/aligungr/UERANSIM.git /opt/open5gs
+RUN git clone https://github.com/ompodjol/UERANSIM.git /opt/open5gs
 
 # Set the working directory
 WORKDIR /opt/open5gs
