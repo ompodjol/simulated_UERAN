@@ -1,0 +1,26 @@
+db.subscribers.insertOne({
+  imsi: "imsi-240060000000001",
+  security: {
+    k: "465B5CE8B199B49FAA5F0A2EE238A6BC",
+    opc: "E8ED289DEBA952E4283B54E88E6183CA"
+  },
+  ambr: {
+    uplink: 100000000,
+    downlink: 200000000
+  },
+  subscr_id: "356938035643803",
+  apn: [
+    {
+      apn: "internet",
+      qci: 9,
+      ambr: {
+        uplink: 100000000,
+        downlink: 200000000
+      },
+      pdn: {
+        type: 0
+      }
+    }
+  ]
+})
+
