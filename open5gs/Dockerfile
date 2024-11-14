@@ -65,7 +65,7 @@ EXPOSE 27017 9999
 # Clone and build UERANSIM
 RUN git clone https://github.com/ompodjol/UERANSIM.git /opt/UERANSIM && \
     cd /opt/UERANSIM && \
-    git pull -r \
+    git pull -r && \
     make
 
 # Set the working directory
@@ -77,6 +77,8 @@ RUN systemctl enable mongod
 # Use sed to find and replace a string in the configuration file
 RUN sed -i 's/mcc: 999/mcc: 240/g' /etc/open5gs/*.yaml
 RUN sed -i 's/mnc: 70/mnc: 06/g' /etc/open5gs/*.yaml
+RUN sed -i 's/PLMN-ID:99970/PLMN-ID:24006/g' /etc/open5gs/*.yaml
+
 
 # Set the default command to initialize systemd
 # Start MongoDB
