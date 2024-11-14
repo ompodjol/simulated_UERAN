@@ -4,8 +4,7 @@ FROM ubuntu:22.04
 # Set the non-interactive frontend to avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-
-# Update package lists and install required packages
+# Install dependencies, MongoDB, and Open5GS
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         make \
@@ -25,59 +24,57 @@ RUN apt-get update && \
         openssh-client \
         curl \
         gnupg \
+        software-properties-common \
         systemd systemd-sysv dbus && \
+    curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg && \
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        mongodb-org \
+        mongodb-mongosh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Mask unwanted systemd services to prevent them from running in the container
-RUN systemctl mask \
-    dev-hugepages.mount \
-    sys-fs-fuse-connections.mount \
-    sys-kernel-config.mount \
-    sys-kernel-debug.mount \
-    systemd-logind.service \
-    getty.target \
-    console-getty.service
-
-
-RUN curl -fsSL https://pgp.mongodb.com/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
-
-RUN echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+# Install the latest Node.js LTS version
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        mongodb-org && \
-        apt-get clean
-
-# Create the MongoDB data directory
-RUN mkdir -p /data/db
-
-# Expose the default MongoDB port
-EXPOSE 27017
-
-# Start MongoDB
-CMD ["mongod", "--bind_ip_all"]
+        software-properties-common && \
+    add-apt-repository ppa:open5gs/latest
 
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository ppa:open5gs/latest && \
-    apt-get update && \
-    apt-get install -y open5gs && \
-    apt-get clean
+    apt-get install -y --no-install-recommends \
+        open5gs
+
+# Configure and prepare MongoDB
+RUN mkdir -p /data/db && chown -R mongodb:mongodb /data/db
 
 
-# Clone the UERANSIM repository
-RUN git clone https://github.com/ompodjol/UERANSIM.git /opt/open5gs
+# Clone the Open5GS repository and set up the WebUI
+RUN git clone https://github.com/open5gs/open5gs.git /opt/open5gs && \
+    cd /opt/open5gs/webui && \
+    npm install && \
+    npm run build
+
+# Expose default MongoDB port
+EXPOSE 27017 9999
+
+# Clone and build UERANSIM
+RUN git clone https://github.com/ompodjol/UERANSIM.git /opt/UERANSIM && \
+    cd /opt/UERANSIM && \
+    make
 
 # Set the working directory
-WORKDIR /opt/open5gs
+WORKDIR /opt/UERANSIM
 
-# Build UERANSIM
-RUN make
-
-# Set the default command to launch an interactive shell
-#CMD ["/bin/bash"]
+# Enable MongoDB service
+RUN systemctl enable mongod
 
 # Set the default command to initialize systemd
-CMD ["/sbin/init"]
+# Start MongoDB
+# Start WebUI
+CMD ["sh", "-c", "mongod --dbpath /data/db --bind_ip_all --port 27017 & cd /opt/open5gs/webui && npm run dev -- --host 0.0.0.0 & exec /sbin/init"]
+
