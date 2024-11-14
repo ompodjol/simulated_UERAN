@@ -60,4 +60,6 @@ openssl genpkey -algorithm X25519 -out /etc/open5gs/hnet/curve25519-1.key
 The public key is used when creating the SIM.
 openssl pkey -in /etc/open5gs/hnet/curve25519-1.key -text
 
+# To restart open5gs all
+sudo systemctl restart open5gs-*
 
