@@ -75,9 +75,9 @@ WORKDIR /opt/UERANSIM
 RUN systemctl enable mongod
 
 # Use sed to find and replace a string in the configuration file
-RUN sed -i 's/mcc: 999/mcc: 240/g' /etc/open5gs/*.yaml
-RUN sed -i 's/mnc: 70/mnc: 06/g' /etc/open5gs/*.yaml
-RUN sed -i 's/PLMN-ID:99970/PLMN-ID:24006/g' /etc/open5gs/*.yaml
+#RUN sed -i 's/mcc: 999/mcc: 240/g' /etc/open5gs/*.yaml
+#RUN sed -i 's/mnc: 70/mnc: 06/g' /etc/open5gs/*.yaml
+#RUN sed -i 's/PLMN-ID:99970/PLMN-ID:24006/g' /etc/open5gs/*.yaml
 
 
 # Set the default command to initialize systemd
