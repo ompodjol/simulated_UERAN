@@ -7,7 +7,7 @@ docker build -t open5gs-webui .
 # Run the image name open5gs and label the container name as open5gs
 sudo docker run -d --name open5gs open5gs tail -f /dev/null
 #or
-docker run --privileged -d --name open5gs-webui -p 9999:9999 -p 27017:27017 open5gs-webui
+docker run --privileged -d --name open5gs-webui -p 9999:9999 -p 27017:27017 -p 9191:9191 -p 9192:9192 -p 9193:9193 -p 9194:9194 open5gs-webui
 
 #to Access Web UI:
 http://<container_ip>:3000

@@ -60,7 +60,7 @@ RUN git clone https://github.com/open5gs/open5gs.git /opt/open5gs && \
     npm run build
 
 # Expose default MongoDB port
-EXPOSE 27017 9999
+EXPOSE 27017 9999 9191 9192 9193 9194
 
 # Clone and build UERANSIM
 RUN git clone https://github.com/ompodjol/UERANSIM.git /opt/UERANSIM && \
